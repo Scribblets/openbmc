@@ -1,0 +1,53 @@
+input[type="text"],
+input[type="password"] {
+  border: none;
+  border-bottom: 1px solid #979797;
+  color: #2e333b;
+  width: 100%;
+  padding: 0 0 12px 0;
+  margin-top: 25px;
+  font-size: 10pt;
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-bottom: 1px solid #2e333b;
+}
+
+::-webkit-input-placeholder {
+   color: #cbccce;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: #cbccce;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: #cbccce;
+}
+
+:-ms-input-placeholder {
+   color: #cbccce;
+}
+
+.inputGroup {
+  position: relative;
+  clear: both;
+}
+
+.inputError,
+.optional {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  position: absolute;
+  top: 55px;
+  right: 0;
+}
+
+.optional {
+  top: 26px;
+  font-style: italic;
+  opacity: 0.5;
+}

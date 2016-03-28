@@ -1,0 +1,44 @@
+<!-- login.html -->
+<section id="login">
+  <header class="noselect">
+    <h1><span class="open">Open</span><span class="bmc">BMC</span></h1>
+  </header>
+
+  <form id="loginForm" name="loginForm" ng-submit="login()">
+    <h2 class="noselect">Let's get started</h2>
+    <p class="noselect">To connect to your BMC, please enter your login credentials.</p>
+
+    <div class="container">
+      <div id="ipAddress" class="inputGroup">
+        <input type="text" placeholder="IP Address" name="ipAddress" ng-model="ipAddress" ng-focus="ipFocus = true" ng-pattern="regex" required />
+        <p class="inputError" ng-show="loginForm.ipAddress.$invalid && loginForm.ipAddress.$touched && !loginForm.ipAddress.$error.required && ipFocus">Invalid IP</p>
+        <p class="inputError" ng-show="loginForm.ipAddress.$error.required && loginForm.ipAddress.$touched">Required</p>
+      </div>
+
+      <div id="port" class="inputGroup">
+        <input type="text" placeholder="Port" name="port" ng-model="port" ng-focus="portFocus = true" maxlength="5" ng-pattern="/^\d+$/" />
+        <p class="optional">Optional</p>
+        <p class="inputError" ng-show="loginForm.port.$invalid && portFocus">Invalid Port</p>
+      </div>
+
+
+      <div class="inputGroup">
+        <input type="text" placeholder="Username" name="username" ng-model="username" required />
+        <p class="inputError" ng-show="loginForm.username.$error.required && loginForm.username.$touched">Required</p>
+      </div>
+
+      <div class="inputGroup">
+        <input type="password" placeholder="Password" name="password" ng-model="password" required />
+        <p class="inputError" ng-show="loginForm.password.$error.required && loginForm.password.$touched">Required</p>
+      </div>
+
+      <p id="error" class="loginError" ng-show="loginError">Error: <span ng-bind-html="errorMessage"></span></p>
+
+      <button type="submit" ng-disabled="loginForm.$invalid">Connect</button>
+    </div>
+  </form>
+  <!-- <h1>Login Page</h1>
+  <p>{{ message }}</p>
+
+  <button ng-click="expandWindow()">Large</button> -->
+</section>

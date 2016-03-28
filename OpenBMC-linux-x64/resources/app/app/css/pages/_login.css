@@ -1,0 +1,76 @@
+/*#login {
+  background: #FFF;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  top: 90px;
+}*/
+
+#login header {
+  height: 90px;
+  background-color: #2e333b;
+  text-align: center;
+  padding: 10px;
+  font-size: 12pt;
+}
+
+#login .open {
+  color: #4ea6e3;
+  font-weight: 400;
+}
+
+#login .bmc {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* login form */
+#login form#loginForm {
+  background-color: #fff;
+  position: fixed;
+  height: 350px;
+  width: 100%;
+  bottom: 0;
+
+  text-align: center;
+}
+
+#login form#loginForm h2 {
+  margin-top: 25px;
+}
+
+#login form#loginForm p {
+  font-size: 9pt;
+  color: #828589;
+}
+
+#login form#loginForm .container {
+  width: 300px;
+  margin: 0 auto;
+}
+
+/* inputs */
+#ipAddress {
+  width: 180px;
+  max-width: 180px;
+  float: left;
+  clear: none;
+}
+
+#port {
+  width: 100px;
+  max-width: 100px;
+  float: right;
+  clear: none;
+}
+
+/* Error Messages */
+.loginError {
+  color: #eb5e77 !important;
+  margin: 0;
+  padding: 0;
+  height: 0;
+  margin-top: 6px;
+  margin-bottom: -6px;
+}
