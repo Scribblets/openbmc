@@ -40,60 +40,105 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
   $scope.login = function() {
     var ip = $scope.ipAddress;
 
+    console.log("SUBMITTED");
+    console.log($scope.ipAddress);
+    console.log($scope.port);
+
     if($scope.port) {
-      ip = $scope.ipAddress + ':' + $scope.port;
+      console.log("FOUND PORT", $scope.port);
+      ip = ip + ':' + $scope.port;
+      console.log(ip);
     }
 
     var startTime = new Date().getTime();
 
     $http({
-      url: 'http://' + ip + '/login',
-      method: 'POST',
-      data: JSON.stringify({"data": [$scope.username, $scope.password]}),
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      url: 'http://' + ip + '/list',
+      method: 'GET',
       timeout: 5000,
+      headers: {
+        'Content-Type' : 'application/json'
+      }
     }).success(function(response) {
+      console.log(response);
+
+      $rootScope.ip = ip;
+      $rootScope.user = $scope.username;
+
+      $scope.error = false;
+      $location.path('/app');
+    }).error(function(result, status, header, config) {
+      console.log(error);
 
       if(typeof response != 'object') {
         console.log("AUTH ERROR");
         $scope.loginError = true;
-        $scope.errorMessage = 'Cannot bypass firewall on <b>' + $scope.ipAddress + '</b>';
+        $scope.errorMessage = 'Connection to <b>' + $scope.ipAddress + '</b> was refused.';
         return;
       }
 
-      console.log(response);
-      console.log(response.data);
-
-      if(response.data === 'Invalid username or password') {
-        // Error: Credentials Incorrect
-        $scope.loginError = true;
-        $scope.errorMessage = "Username or password was incorrect";
-        console.error('Username or password was incorrect');
-      } else {
-        console.log('Logged in as ' + $scope.username);
-        // Success!
-        $scope.error = false;
-        $rootScope.ip = $scope.ipAddress;
-        $rootScope.user = $scope.username;
-        $location.path('/app');
-      }
-      // I need to set the cookie here!
-    }).error(function(result, status, header, config) {
       var respTime = new Date().getTime() - startTime;
+
       if(respTime >= config.timeout) {
-        $scope.loginError = true;
-        $scope.errorMessage = "Could not connect to " + ip;
-        console.error('Could not connect to ' + ip);
-      } else {
-        $scope.loginError = true;
-        $scope.errorMessage = "An unknown error occurred.";
-        console.error('An unknown error occurred. See details:');
-        console.log(result, status, header, config);
-      }
+          $scope.loginError = true;
+          $scope.errorMessage = "Could not connect to " + ip;
+          console.error('Could not connect to ' + ip);
+        } else {
+          $scope.loginError = true;
+          $scope.errorMessage = "An unknown error occurred.";
+          console.error('An unknown error occurred. See details:');
+          console.log(result, status, header, config);
+        }
     });
+
+    // $http({
+    //   url: 'http://' + ip + '/login',
+    //   method: 'POST',
+    //   data: JSON.stringify({"data": [$scope.username, $scope.password]}),
+    //   withCredentials: true,
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   timeout: 5000,
+    // }).success(function(response) {
+    //
+    //   if(typeof response != 'object') {
+    //     console.log("AUTH ERROR");
+    //     $scope.loginError = true;
+    //     $scope.errorMessage = 'Cannot bypass firewall on <b>' + $scope.ipAddress + '</b>';
+    //     return;
+    //   }
+    //
+    //   console.log(response);
+    //   console.log(response.data);
+    //
+    //   if(response.data === 'Invalid username or password') {
+    //     // Error: Credentials Incorrect
+    //     $scope.loginError = true;
+    //     $scope.errorMessage = "Username or password was incorrect";
+    //     console.error('Username or password was incorrect');
+    //   } else {
+    //     console.log('Logged in as ' + $scope.username);
+    //     // Success!
+    //     $scope.error = false;
+    //     $rootScope.ip = $scope.ipAddress;
+    //     $rootScope.user = $scope.username;
+    //     $location.path('/app');
+    //   }
+    //   // I need to set the cookie here!
+    // }).error(function(result, status, header, config) {
+    //   var respTime = new Date().getTime() - startTime;
+    //   if(respTime >= config.timeout) {
+    //     $scope.loginError = true;
+    //     $scope.errorMessage = "Could not connect to " + ip;
+    //     console.error('Could not connect to ' + ip);
+    //   } else {
+    //     $scope.loginError = true;
+    //     $scope.errorMessage = "An unknown error occurred.";
+    //     console.error('An unknown error occurred. See details:');
+    //     console.log(result, status, header, config);
+    //   }
+    // });
   }
 });
 
@@ -101,8 +146,10 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
   _ipc.send('resize', 1008, 617);
   _ipc.send('toggleResizable', true);
 
+  console.log("APP CONTROLLER", $rootScope.ip);
+
   $http({
-    url: 'http://' + $rootScope.ip + ':20080/list',
+    url: 'http://' + $rootScope.ip + '/list',
     method: 'GET',
     headers: {
       'Content-Type' : 'application/json'
@@ -200,7 +247,7 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
       console.log("SHOW SCHEMA!");
       console.log("====================");
 
-      getSchema($rootScope.ip, '20080', path);
+      getSchema($rootScope.ip, path);
 
       options = $scope.options;
       for(var j = 0; j < options.length; j++) {
@@ -216,8 +263,8 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
     //console.log(position);
   }
 
-  function getSchema(ip, port, path) {
-    var query = 'http://' + ip + ':' + port + path + '/schema';
+  function getSchema(ip, path) {
+    var query = 'http://' + ip + path + '/schema';
     console.log('Running schema on... ' + query);
     $http({
       url: query,
@@ -294,11 +341,11 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
             console.log(curlParams);
             if(curlParams === '') {
               // GET OPERATION
-              m['curl'] = 'curl -c cjar -b cjar -k https://' + $rootScope.ip + ':10080' + $scope.currentPath + '/' + m.name;
+              m['curl'] = 'curl -c cjar -b cjar -k https://' + $rootScope.ip + $scope.currentPath + '/' + m.name;
               m['type'] = 'GET';
             } else {
               // POST OPERATION
-              m['curl'] = 'curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" https://' + $rootScope.ip + ':10080' + $scope.currentPath + '/' + m.name;
+              m['curl'] = 'curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" https://' + $rootScope.ip + $scope.currentPath + '/' + m.name;
               m['type'] = 'POST';
             }
 
