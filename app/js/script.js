@@ -35,31 +35,9 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
   _ipc.send('resize', 396, 445);
 
   $scope.loginError = false;
-  $scope.message = 'This is the login page!';
   $scope.regex = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
 
-  $scope.expandWindow = function() {
-    console.log("Expand the window!");
-    _ipc.send('resize', 600, 800);
-  };
-
-  $scope.authenticateExternalIP = function() {
-    console.log("CLICKED");
-    require("shell").openExternal($scope.ipAddress);
-  }
-
   $scope.login = function() {
-    console.log("Form was submitted! Here's the data:");
-    console.log($scope.ipAddress);
-    console.log($scope.port);
-    console.log($scope.username);
-    console.log($scope.password);
-
-    // $http.jsonp("http://9.41.164.53:10080/login?callback=?")
-    // .then(function(json) {
-    //   console.log(json);
-    // });
-
     var ip = $scope.ipAddress;
 
     if($scope.port) {
@@ -69,7 +47,6 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
     var startTime = new Date().getTime();
 
     $http({
-      // url: 'http://9.41.164.53:10080/login',
       url: 'http://' + ip + '/login',
       method: 'POST',
       data: JSON.stringify({"data": [$scope.username, $scope.password]}),
@@ -250,13 +227,87 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
       }
     }).success(function(response) {
       console.log(response.data);
+      var methods = [];
       for (var key in response.data) {
         // Focus on methods, disregard signals for now
         // each object under method names is a parameter, so create an input
         // 'name' is the name of the parameter
         // before worrying about functions, present a list of methods
-        console.log(key);
+        if(key.indexOf('openbmc') > -1) {
+          console.log(key);
+          console.log(response.data[key].method);
+          // Inside the method object are multiple arrays.
+          // The keys of the arrays are the name of the method (from the selected openbmc interface).
+          // The array itself is a list of objects that are the parameters for the method.
+          // --- An input is created for each parameter.
+          // Each parameter object contains three properties: direction, name, and type.
+          // --- Direction (in / out) indicates the type of output from the server.
+          // --- The name, is the name of the paramter.
+          // --- The type is the datatype for the paramter.
+          //     (Reference: https://dbus.freedesktop.org/doc/dbus-specification.html#type-system )
+          for(var method in response.data[key].method) {
+            // This is looping over each method
+            console.log("THE METHOD:", method);
+            // curl command:
+            // curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\"data\": [<positional-parameters>]}" https://bmc/org/openbmc/control/fan0/action/setspeed
+            var m = {
+              'name' : method,
+              'parameters' : []
+            };
+
+            var curlParams = '';
+
+            for(var i = 0; i < response.data[key].method[method].length; i++) {
+              console.log("RAWRAWRAWR");
+              console.log(response.data[key].method[method][i]);
+
+              var paramObject = {};
+
+              for (type in response.data[key].method[method][i]) {
+                paramObject[type] = response.data[key].method[method][i][type];
+
+                if(type === 'name') {
+                  curlParams += response.data[key].method[method][i][type] + ',';
+                }
+              }
+
+
+              m.parameters.push(paramObject);
+
+              // var
+              //
+              // for(type in response.data[key].method[method][i]) {
+              //
+              // }
+              // This is looping over each parameter
+              // var p = {};
+              // p['name'] = response.data[key].method[method][i].name;
+              // p['direction'] = response.data[key].method[method][i].direction;
+              // p['type'] = response.data[key].method[method][i].type;
+
+              // m.parameters.push(p);
+
+              // curlParams += response.data[key].method[method][i].name + ', ';
+            }
+            console.log(curlParams)
+            curlParams = curlParams.slice(0, -1);
+            console.log(curlParams);
+            if(curlParams === '') {
+              // GET OPERATION
+              m['curl'] = 'curl -c cjar -b cjar -k https://' + $rootScope.ip + ':10080' + $scope.currentPath + '/' + m.name;
+              m['type'] = 'GET';
+            } else {
+              // POST OPERATION
+              m['curl'] = 'curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" https://' + $rootScope.ip + ':10080' + $scope.currentPath + '/' + m.name;
+              m['type'] = 'POST';
+            }
+
+            methods.push(m);
+          }
+        }
       }
+      console.log("LOGGING METHODS!");
+      $scope.methods = methods;
     }).error(function(error) {
       console.log(error);
     });

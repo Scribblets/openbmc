@@ -27,8 +27,8 @@
 
       <div class="serverInformation">
         <div class="leftCol">
-          <p class="ipInfo">9.41.164.53:10080</p>
-          <p class="userInfo">Logged in as <b>root</b></p>
+          <p class="ipInfo">{{ip}}</p>
+          <p class="userInfo">Logged in as <b>{{user}}</b></p>
         </div>
 
         <div class="rightCol">
@@ -40,6 +40,22 @@
     <section class="contentArea">
       <!-- Make the breadcrumbs clickable when you have time! -->
       <p id="breadcrumbs"><i class="fa fa-home"></i> {{prettyPath}}</p>
+
+      <section class="methods">
+        <div class="methodContainer" ng-repeat="method in methods">
+          <div class="methodTitle">{{method.name}}</div>
+          <div class="methodBody">
+            <div class="parameters">
+              <p ng-repeat="param in method.parameters" ng-show="param.name">{{param.name}}</p>
+            </div>
+            <div class="response"></div>
+
+            <div class="curl">{{method.curl}}</div>
+          </div>
+        </div>
+
+
+      </section>
     </section>
   </section>
 </section>
