@@ -8,7 +8,7 @@
     </header>
 
     <div class="paths">
-      <a class="path noselect" ng-class="{'active':option.active}" ng-click="navigate(option.path)">{{option.name}}</a>
+      <a class="path noselect" ng-repeat="option in options" ng-class="{'active':option.active}" ng-click="navigate(option.path)">{{option.name}}</a>
     </div>
 
     <footer class="github">
@@ -45,13 +45,19 @@
     <!-- Content -->
     <div class="container">
       <div class="method" ng-repeat="method in methods">
-        <div class="title"><p><span>{{method.name}}</span> <span class="chevron"><i class="fa fa-chevron-down"></i>
-</span></p></div>
-        <div class="body">
+        <a class="click-me" ng-click="toggleMethod(method)"><div class="title">
+          <p><span>{{method.name}}</span>
+          <span class="chevron">
+            <i class="fa fa-chevron-down" ng-show="method.collapsed"></i>
+            <i class="fa fa-chevron-up" ng-hide="method.collapsed"></i>
+          </span></p>
+        </div></a>
+        <div class="body" ng-hide="method.collapsed">
           <!-- Parameters Block -->
-          <div class="parameters">
+          <!-- How can we hide parameters block? -->
+          <div class="parameters" ng-hide="method.hideParams">
             <h3>Parameters</h3>
-
+            <!-- <p ng-show="method.hideParams">There are no parameters for this method.</p> -->
             <div class="parameter" ng-repeat="parameter in method.parameters" ng-show="parameter.name">
               <p class="name">{{parameter.name}}</p>
               <div class="right">

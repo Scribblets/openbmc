@@ -69,6 +69,10 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
       $location.path('/app');
     }).error(function(result, status, header, config) {
       console.log(error);
+      console.log(result);
+      console.log(status);
+      console.log(header);
+      console.log(config);
 
       if(typeof response != 'object') {
         console.log("AUTH ERROR");
@@ -195,6 +199,14 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
     _ipc.send('toggleResizable', false);
   }
 
+  $scope.toggleMethod = function(method) {
+    if(method.collapsed === false) {
+      method.collapsed = true;
+    } else {
+      method.collapsed = false;
+    }
+  }
+
   function parsePathArray(paths) {
     var parsed = {};
     for(var i = 0; i < paths.length; i++) {
@@ -305,6 +317,7 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
             // curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\"data\": [<positional-parameters>]}" https://bmc/org/openbmc/control/fan0/action/setspeed
             var m = {
               'name' : method,
+              'hideParams': true,
               'parameters' : []
             };
 
@@ -349,17 +362,22 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
               // GET OPERATION
               m['curl'] = 'curl -c cjar -b cjar -k https://' + $rootScope.ip + $scope.currentPath + '/' + m.name;
               m['type'] = 'GET';
+              m['hideParams'] = true;
             } else {
               // POST OPERATION
-              m['curl'] = 'curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" https://' + $rootScope.ip + $scope.currentPath + '/' + m.name;
+              m['curl'] = 'curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" https://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name;
               m['type'] = 'POST';
+              m['hideParams'] = false;
             }
+
+            m['collapsed'] = true;
 
             methods.push(m);
           }
         }
       }
       console.log("LOGGING METHODS!");
+      // methods[0].collapsed = false;
       $scope.methods = methods;
     }).error(function(error) {
       console.log(error);

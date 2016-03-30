@@ -166,16 +166,23 @@
   border-left: 2px solid #dbe5ee;
 }
 
+.method .click-me {
+  cursor: pointer;
+}
+
 .method .title {
-  border-bottom: 1px solid #dbe5ee;
+  /*border-top: 1px solid #dbe5ee;*/
   padding: 10px 15px;
   font-size: 10pt;
   font-weight: 400;
   color: #55606c;
+  border-bottom: 1px solid #dbe5ee;
 }
 
-.method .title p {
+.method .title p,
+.method .title a {
   margin: 0;
+  cursor: pointer;
 }
 
 .method .title span {
@@ -202,6 +209,7 @@
 .method .body {
   padding: 15px;
   padding-top: 0px;
+  border-bottom: 1px solid #dbe5ee;
 }
 
 /* Parameters */
@@ -211,7 +219,8 @@
 }
 
 .parameter {
-  width: 100%;
+  /*width: 100%;*/
+  margin-right: 20px;
   background: #fafdff;
   border: 1px solid #eef4f9;
   font-size: 9pt;
@@ -227,7 +236,7 @@
 
 .parameter .right {
   float: right;
-  width: 63%;
+  width: 53%;
 }
 
 .parameter .right input,
@@ -259,8 +268,8 @@
 
 /* Response */
 .response {
-  width: 45%;
-  float: right;
+  width: 55%;
+  float: left;
 }
 
 /* cURL */
