@@ -1,157 +1,306 @@
-#app nav.sidebar {
-  position: absolute;
-  top: 23px;
-  bottom: 0;
-  width: 200px;
-  max-width: 200px;
+/* _app.css */
+#app {
+  position: relative;
 }
 
-#app nav.sidebar header p {
-  color: #8397a9;
+#app .content {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  float: left;
+  /* background: #eef4f9; */
+  background: url('../../imgs/ibm.svg') 70% 50% / 550px 200px no-repeat, #eef4f9;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar */
+#app .sidebar {
+  position: absolute;
+  width: 20%;
+  background: #2e333b;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  float: left;
+  z-index: 2;
+}
+
+.sidebar header {
+  margin-top: 20px;
+}
+
+.sidebar header p {
+  color: #8ca0b3;
   font-size: 11pt;
   line-height: 3px;
-  margin-right: 70px;
-  float: right;
+  float: left;
+  margin-left: 16%;
 }
 
-.options {
-  padding-top: 10px;
+.sidebar .paths {
+  background: #23272d;
+  width: 20%;
+  bottom: 54px;
+  top: 58px;
+  position: fixed;
+  padding: 15px 0px;
+  overflow-y: scroll;
 }
 
-#app .paths {
-  background-color: #23272d;
-  position: relative;
-  margin-top: 38px;
-  width: 100%;
-  height: 100%;
-}
-
-#app .path {
+.sidebar .paths .path {
   color: #8ca0b3;
   display: block;
   padding: 10px 25px;
   font-size: 9pt;
-  font-weight: 300;
+  font-weight: 400;
   text-transform: capitalize;
   cursor: pointer;
 }
 
-#app .path:hover, #app .path.active {
-  background-color: #4ea6e3 !important;
+.sidebar .paths .path:hover,
+.sidebar .paths .path:active {
+  background-color: #4ea6e3;
   color: #fff;
 }
 
-#app .github {
-  background: #2e333b;
+.sidebar .github {
   color: #8ca0b3;
   font-size: 9pt;
   position: fixed;
   bottom: 0;
-  width: 200px;
-  padding: 20px 0;
   text-align: center;
+  width: 20%;
+  padding: 20px 0;
 }
 
-#app .github a {
+.sidebar .github a {
   cursor: pointer;
 }
 
-#app .github a:hover {
+.sidebar .github a:hover {
   color: #4ea6e3;
 }
 
-/* Main Content Section */
-#app .mainContent {
-  background: url('../../imgs/ibm.svg') 50% 50% / 550px 200px no-repeat, #eef4f9;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  left: 200px;
-  bottom: 0px;
-  /* Add IBM Logo Background Here */
-}
-
+/* Topbar */
 #app .topbar {
-  height: 61px;
+  position: fixed;
+  left: 20%;
+  right: 0;
+  top: 0;
   background: #fff;
+  height: 58px;
+  z-index: 2;
 }
 
-#app #search {
-  max-width: 300px;
-  float: left;
-}
-
-#app #search input {
-  border: none;
-  margin-left: 50px;
-  margin-top: 23px;
-}
-
-#app #search input::-webkit-input-placeholder {
-   color: #8ca0b3;
-   font-weight: 500;
-}
-
-#app #search input:-moz-placeholder { /* Firefox 18- */
-   color: #8ca0b3;
-   font-weight: 500;
-}
-
-#app #search input::-moz-placeholder {  /* Firefox 19+ */
-   color: #8ca0b3;
-   font-weight: 500;
-}
-
-#app #search input:-ms-input-placeholder {
-   color: #8ca0b3;
-   font-weight: 500;
-}
-
-.fa-search {
-  position: absolute;
-  top: 23px;
-  left: 17px;
-  color: #8ca0b3;
-}
-
-.serverInformation {
+.topbar .metadata {
+  width: 140px;
   float: right;
   text-align: right;
-  margin-top: 7px;
+  padding: 7px 20px 0 0;
 }
 
-.serverInformation .ipInfo {
+.topbar .metadata .connectedIP {
   color: #5f6f7f;
   font-size: 9pt;
   margin: 8px 0px 3px 0px;
 }
 
-.serverInformation .userInfo {
+.topbar .metadata .connectedUser {
   color: #8ea2b5;
   font-size: 7pt;
   padding: 0;
   margin: 0;
 }
 
-.leftCol {
-  float: left;
-  margin-right: 13px;
-  text-align: right;
-}
-
-.rightCol {
-  float: right;
-  margin-right: 15px;
-}
-
-.rightCol a {
+.topbar .metadata .right a {
   font-size: 26pt;
   color: #eb5e77;
+  line-height: 33pt;
 }
 
-/* Content Area */
-#app .contentArea {
-  width: calc(100% - 20px);
-  height: calc(100% - 74px);
-  margin-left: 20px;
+.topbar #searchForm {
+  padding: 25px 0px 0px 20px;
+  float: left;
 }
+
+.topbar #searchForm i,
+.topbar #searchForm input {
+  float: left;
+}
+
+.topbar #searchForm input {
+  width: 60%;
+  margin: 0 0 0 10px;
+  border: none;
+}
+
+/* Breadcrumbs */
+#app #breadcrumbs {
+  position: fixed;
+  left: 20%;
+  right: 0;
+  top: 45px;
+  background: #eef4f9;
+  padding: 12px 20px;
+  z-index: 3;
+  /*box-shadow: 0px 2px 2px #e9eff5;*/
+  box-shadow: 0px 2px 3px rgba(0,0,0,0.03);
+  border-bottom: 1px solid #dfe9f2;
+  border-top: 1px solid #dfe9f2;
+}
+
+#app .content .container {
+  padding-left: 20%;
+  padding-top: 120px;
+  text-align: left;
+  z-index: 5;
+  /* background: rgba(0,0,0,.05); */
+}
+
+.method {
+  background-color: #fff;
+  margin-left: 23px;
+  border-left: 2px solid #dbe5ee;
+}
+
+.method .title {
+  border-bottom: 1px solid #dbe5ee;
+  padding: 10px 15px;
+  font-size: 10pt;
+  font-weight: 400;
+  color: #55606c;
+}
+
+.method .title p {
+  margin: 0;
+}
+
+.method .title span {
+  margin-top: 5px;
+}
+
+.method .title .type {
+  font-size: 5pt;
+  font-weight: 600;
+  display: block;
+  float: left;
+  background: #4ea6e3;
+  color: #fff;
+  padding: 4px;
+  border-radius: 2px;
+  margin-top: 2px;
+}
+
+.method .title .chevron {
+  float: right;
+  margin: 0;
+}
+
+.method .body {
+  padding: 15px;
+  padding-top: 0px;
+}
+
+/* Parameters */
+.parameters {
+  width: 45%;
+  float: left;
+}
+
+.parameter {
+  width: 100%;
+  background: #fafdff;
+  border: 1px solid #eef4f9;
+  font-size: 9pt;
+  color: #858f98;
+  padding: 0px 10px;
+  margin-bottom: 10px;
+}
+
+.parameter .name,
+.parameter .right input {
+  float: left;
+}
+
+.parameter .right {
+  float: right;
+  width: 63%;
+}
+
+.parameter .right input,
+.parameter .right p {
+  float: right;
+}
+
+.parameter .right input {
+  width: 45%;
+  margin: 5px 8px 0 0;
+  border: 1px solid #b0b7bd;
+  border-radius: 3px;
+  padding: 5px;
+  color: #838d96;
+}
+
+.parameter .dataType {
+  font-family: 'Courier New';
+  font-weight: 600;
+  font-size: 8pt;
+  padding-top: 12px;
+  margin: 0;
+}
+
+.parameters,
+.response {
+  margin-top: 10px;
+}
+
+/* Response */
+.response {
+  width: 45%;
+  float: right;
+}
+
+/* cURL */
+.curl {
+  clear: both;
+  padding-top: 15px;
+}
+
+/* Code Box - Default Styling */
+ .code {
+   font-family: 'Courier New';
+   font-size: 9pt;
+   background-color: #fafdff;
+   border: 1px solid #eef4f9;
+   border-radius: 3px;
+   padding: 8px 10px;
+   position: relative;
+   padding-right: 55px;
+   word-wrap: break-word;
+   line-height: 14pt;
+ }
+
+ .code p,
+ .code pre {
+   margin: 0;
+   padding: 0;
+ }
+
+ .code button {
+   position: absolute;
+   top: 0;
+   right: 0;
+   margin: 0;
+   padding: 0;
+   width: auto;
+   padding: 9px 12px;
+   font-size: 8pt;
+   font-family: 'Helvetica Neue', sans-serif;
+ }
+
+ .code button.large-btn {
+   border-radius: 0px 3px 0px 3px;
+ }

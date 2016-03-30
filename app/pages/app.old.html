@@ -1,0 +1,79 @@
+<!-- app.html -->
+<section id="app">
+  <nav class="sidebar">
+    <header>
+      <a class="btn-back noselect" ng-click="back()">Back</a>
+      <p>Browse</p>
+    </header>
+
+    <section class="paths">
+      <div class="options">
+        <a class="path noselect" ng-class="{'active':  option.active}" ng-repeat="option in options" ng-click="navigate(option.path)">{{option.name}}</a>
+        <!-- <a class="path">dbus</a>
+        <a class="path">object</a>
+        <a class="path">watchdog</a> -->
+      </data>
+      <div class="github">Powered by <a ng-click="openGithub()">Open<b>BMC</b> <i class="fa fa-github-alt"></i>
+</a></div>
+    </section>
+  </nav>
+
+  <section class="mainContent">
+    <section class="topbar">
+      <form id="search">
+        <i class="fa fa-search fa-lg"></i>
+        <input type="text" placeholder="Search" />
+      </form>
+
+      <div class="serverInformation">
+        <div class="leftCol">
+          <p class="ipInfo">{{ip}}</p>
+          <p class="userInfo">Logged in as <b>{{user}}</b></p>
+        </div>
+
+        <div class="rightCol">
+          <a ng-click="signout()"><i class="fa fa-sign-out"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contentArea">
+      <!-- Make the breadcrumbs clickable when you have time! -->
+      <p id="breadcrumbs"><i class="fa fa-home"></i> {{prettyPath}}</p>
+
+      <section class="methods">
+        <div class="methodContainer" ng-repeat="method in methods">
+          <div class="methodTitle">{{method.name}}</div>
+          <div class="methodBody">
+            <div class="parameters">
+              <h3>Parameters</h3>
+              <p ng-repeat="param in method.parameters" ng-show="param.name">{{param.name}}</p>
+            </div>
+            <div class="response">
+              <h3>Response</h3>
+            </div>
+
+            <div>
+              <h3>cURL</h3>
+              <div class="curl">
+                <p>{{method.curl}}</p>
+                <button class="small" ng-show="method.curl.length <= 96" ng-click="copy(method.curl)">Copy</button>
+                <button class="large" ng-show="method.curl.length > 96" ng-click="copy(method.curl)">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+    </section>
+  </section>
+</section>
+
+
+<!-- <div>
+  <h1>The Application</h1>
+  <p>{{ message }}</p>
+
+  <button ng-click="shrinkWindow()">Small</button>
+</div> -->

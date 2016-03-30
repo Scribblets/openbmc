@@ -1,0 +1,231 @@
+#app {
+  background: #eef4f9;
+}
+
+#app nav.sidebar {
+  /* May need to be changed.... */
+  position: fixed;
+  top: 23px;
+  bottom: 0;
+  width: 200px;
+  max-width: 200px;
+}
+
+#app nav.sidebar header p {
+  color: #8397a9;
+  font-size: 11pt;
+  line-height: 3px;
+  margin-right: 70px;
+  float: right;
+}
+
+.options {
+  padding-top: 10px;
+}
+
+#app .paths {
+  background-color: #23272d;
+  position: relative;
+  margin-top: 38px;
+  width: 100%;
+  height: 100%;
+}
+
+#app .path {
+  color: #8ca0b3;
+  display: block;
+  padding: 10px 25px;
+  font-size: 9pt;
+  font-weight: 300;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+#app .path:hover, #app .path.active {
+  background-color: #4ea6e3 !important;
+  color: #fff;
+}
+
+#app .github {
+  background: #2e333b;
+  color: #8ca0b3;
+  font-size: 9pt;
+  position: fixed;
+  bottom: 0;
+  width: 200px;
+  padding: 20px 0;
+  text-align: center;
+}
+
+#app .github a {
+  cursor: pointer;
+}
+
+#app .github a:hover {
+  color: #4ea6e3;
+}
+
+/* Main Content Section */
+#app .mainContent {
+  background: url('../../imgs/ibm.svg') 50% 50% / 550px 200px no-repeat, #eef4f9;
+  /*position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 200px;
+  bottom: 0px;*/
+
+  margin-left: 200px;
+  position: relative;
+  min-height: 100%;
+  min-width: 100%;
+  margin-top: 61px;
+  /* Add IBM Logo Background Here */
+}
+
+#app .topbar {
+  height: 61px;
+  background: #fff;
+  position: fixed;
+  left: 200px;
+  right: 0;
+  top: 0;
+}
+
+#app #search {
+  max-width: 300px;
+  float: left;
+  position: fixed;
+}
+
+#app #search input {
+  border: none;
+  margin-left: 50px;
+  margin-top: 23px;
+}
+
+#app #search input::-webkit-input-placeholder {
+   color: #8ca0b3;
+   font-weight: 500;
+}
+
+#app #search input:-moz-placeholder { /* Firefox 18- */
+   color: #8ca0b3;
+   font-weight: 500;
+}
+
+#app #search input::-moz-placeholder {  /* Firefox 19+ */
+   color: #8ca0b3;
+   font-weight: 500;
+}
+
+#app #search input:-ms-input-placeholder {
+   color: #8ca0b3;
+   font-weight: 500;
+}
+
+.fa-search {
+  position: absolute;
+  top: 23px;
+  left: 17px;
+  color: #8ca0b3;
+}
+
+.serverInformation {
+  float: right;
+  text-align: right;
+  margin-top: 7px;
+}
+
+.serverInformation .ipInfo {
+  color: #5f6f7f;
+  font-size: 9pt;
+  margin: 8px 0px 3px 0px;
+}
+
+.serverInformation .userInfo {
+  color: #8ea2b5;
+  font-size: 7pt;
+  padding: 0;
+  margin: 0;
+}
+
+.leftCol {
+  float: left;
+  margin-right: 13px;
+  text-align: right;
+}
+
+.rightCol {
+  float: right;
+  margin-right: 15px;
+}
+
+.rightCol a {
+  font-size: 26pt;
+  color: #eb5e77;
+}
+
+/* Content Area */
+#app .contentArea {
+  width: calc(100% - 20px);
+  /* height: calc(100% - 74px); */
+  min-height: 100%;
+  margin-left: 20px;
+}
+
+#breadcrumbs {
+  position: fixed;
+  background-color: #eef4f9;
+  padding: 5px 0;
+  top: 48px;
+}
+
+
+/* METHODS */
+#app .methods {
+  background: #fff;
+  border-left: 3px solid #dae4ed;
+}
+
+#app .methods .methodTitle, #app .methods .methodBody {
+  padding: 10px;
+  border-bottom: 1px solid #dfdfdf;
+}
+
+#app .curl {
+  font-family: 'Courier New';
+  font-size: 9pt;
+  background-color: #fafdff;
+  border: 1px solid #eef4f9;
+  border-radius: 3px;
+  padding: 8px 10px;
+  position: relative;
+  padding-right: 25px;
+  word-wrap: break-word;
+}
+
+#app .curl p {
+  margin: 0;
+  padding : 0;
+  color: #8f98a0;
+}
+
+#app .curl button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  padding: 9px 12px;
+  font-size: 8pt;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+#app .curl button.small {
+  border-radius: 0px 3px 3px 0px;
+}
+
+#app .curl button.large {
+  border-radius: 0px 3px 0px 3px;
+}

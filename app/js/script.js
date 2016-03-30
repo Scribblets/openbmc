@@ -143,6 +143,12 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
 });
 
 openbmc.controller('appController', function($rootScope, $scope, $http, $location) {
+
+  $scope.testJSON = JSON.stringify({
+    'responseCode' : 200,
+    'responseMessage' : 'OK',
+    'data' : []
+  }, null, 4);
   _ipc.send('resize', 1008, 617);
   _ipc.send('toggleResizable', true);
 

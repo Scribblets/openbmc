@@ -2,7 +2,7 @@
 @import "_typography.css";
 
 html, body {
-  background-color: #2E333B;
+  /*background-color: #2E333B;*/
   height: 100%;
   overflow: hidden;
   -webkit-app-region: drag;
@@ -17,4 +17,16 @@ html, body {
   user-select: none;           /* non-prefixed version, currently
                                   not supported by any browser */
   cursor: default;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.clear {
+  clear: both;
 }
