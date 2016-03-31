@@ -60,6 +60,13 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
         'Content-Type' : 'application/json'
       }
     }).success(function(response) {
+      if(typeof response != 'object') {
+        console.log("AUTH ERROR");
+        $scope.loginError = true;
+        $scope.errorMessage = 'Cannot bypass firewall on <b>' + $scope.ipAddress + '</b>';
+        return;
+      }
+
       console.log(response);
 
       $rootScope.ip = ip;
