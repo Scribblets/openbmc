@@ -122,6 +122,7 @@
 }
 
 .topbar #searchForm {
+  width: 70%;
   padding: 25px 0px 0px 20px;
   float: left;
 }
@@ -132,7 +133,7 @@
 }
 
 .topbar #searchForm input {
-  width: 60%;
+  width: calc(100% - 50px);
   margin: 0 0 0 10px;
   border: none;
 }
@@ -214,7 +215,8 @@
 
 /* Parameters */
 .parameters {
-  width: 45%;
+  width: 36%;
+  /*width: 260px;*/
   float: left;
 }
 
@@ -229,6 +231,11 @@
   margin-bottom: 10px;
 }
 
+.parameter .name {
+  margin-right: 20px;
+  max-width: 40%;
+}
+
 .parameter .name,
 .parameter .right input {
   float: left;
@@ -236,7 +243,7 @@
 
 .parameter .right {
   float: right;
-  width: 53%;
+  /*width: 53%;*/
 }
 
 .parameter .right input,
@@ -244,13 +251,17 @@
   float: right;
 }
 
-.parameter .right input {
-  width: 45%;
+.parameter input {
+  max-width: 60%;
   margin: 5px 8px 0 0;
   border: 1px solid #b0b7bd;
   border-radius: 3px;
   padding: 5px;
   color: #838d96;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */
+  float: right;
 }
 
 .parameter .dataType {
@@ -261,15 +272,31 @@
   margin: 0;
 }
 
-.parameters,
+/*.parameters,
 .response {
   margin-top: 10px;
-}
+}*/
 
 /* Response */
 .response {
-  width: 55%;
-  float: left;
+  /*width: 64%;*/
+  /*float: left;*/
+  float: right;
+  width: 64%;
+  min-width: 45%;
+  /*margin-left: 260px;*/
+  /*margin-top: 10px;*/
+}
+
+.response.full-width {
+  float: left !important;
+}
+
+.run-btn {
+  float: none;
+  position: relative !important;
+  width: 100% !important;
+  /*margin-left: 22px !important;*/
 }
 
 /* cURL */
@@ -287,7 +314,7 @@
    border-radius: 3px;
    padding: 8px 10px;
    position: relative;
-   padding-right: 55px;
+   /*padding-right: 55px;*/
    word-wrap: break-word;
    line-height: 14pt;
  }
@@ -300,7 +327,7 @@
 
  .code button {
    position: absolute;
-   top: 0;
+   bottom: 0;
    right: 0;
    margin: 0;
    padding: 0;
@@ -311,5 +338,5 @@
  }
 
  .code button.large-btn {
-   border-radius: 0px 3px 0px 3px;
+   border-radius: 3px 0px 3px 0px;
  }

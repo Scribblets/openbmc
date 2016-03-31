@@ -207,6 +207,76 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
     }
   }
 
+  $scope.runMethod = function(method) {
+    console.log(method.parameters);
+    if(method.parameters.length > 0) {
+      var data = [];
+      for (var i = 0; i < method.parameters.length; i++) {
+        data.push(method.parameters[i].value);
+      }
+      $http({
+        url: 'http://' + $rootScope.ip + $scope.currentPath + '/action/' + method.name,
+        method: 'POST',
+        data: JSON.stringify({"data": data}),
+        headers: {'Content-Type': 'application/json'}
+      }).success(function(response) {
+        method.showResponse = true;
+        method.response = JSON.stringify(response, null, 4);
+      }).error(function(response) {
+        method.showResponse = true;
+        method.response = JSON.stringify(response, null, 4);
+      });
+    } else {
+      $http({
+        url: 'http://' + $rootScope.ip + $scope.currentPath + '/action/' + method.name,
+        method: 'POST',
+        data: {"data": []},
+        headers: {'Content-Type': 'application/json'}
+      }).success(function(response) {
+        method.showResponse = true;
+        method.response = JSON.stringify(response, null, 4);
+      }).error(function(response) {
+        method.showResponse = true;
+        method.response = JSON.stringify(response, null, 4);
+      });
+    }
+    // console.log("TEST THE METHOD!");
+    // console.log("=====================");
+    // // THIS WORKS!!!!
+    // $http({
+    //   url: 'http://9.41.164.53:20080/org/openbmc/examples/path0/SDBusObj/action/Echo',
+    //   method: 'POST',
+    //   data: JSON.stringify({"data": ["hello"]}),
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    // }).success(function(response) {
+    //   console.log(response);
+    // }).error(function(error) {
+    //   console.log(response);
+    // });
+  }
+
+  $scope.getDataType = function(type) {
+    if(type === 'y') { return 'byte'; }
+    else if(type === 'b') { return 'boolean' }
+    else if(type === 'n') { return 'int16' }
+    else if(type === 'q') { return 'uint16' }
+    else if(type === 'i') { return 'int32' }
+    else if(type === 'u') { return 'uint32' }
+    else if(type === 'x') { return 'int64' }
+    else if(type === 't') { return 'uint64' }
+    else if(type === 'd') { return 'double' }
+    else if(type === 'h') { return 'unix fd' }
+    else if(type === 's') { return 'string' }
+    else if(type === 'o') { return 'object path' }
+    else if(type === 'g') { return 'signature' }
+    else if(type === 'a') { return 'array' }
+    else if(type.indexOf('(') != -1) { return 'struct'}
+    else if(type.indexOf('a') != -1) { return 'array' }
+    else { return 'undefined'}
+  }
+
   function parsePathArray(paths) {
     var parsed = {};
     for(var i = 0; i < paths.length; i++) {
@@ -291,6 +361,7 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         'Content-Type' : 'application/json'
       }
     }).success(function(response) {
+      console.log("THIS IS WHAT YOU WANT:::");
       console.log(response.data);
       var methods = [];
       for (var key in response.data) {
@@ -318,27 +389,46 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
             var m = {
               'name' : method,
               'hideParams': true,
-              'parameters' : []
+              'parameters' : [],
+              'response' : '',
+              'showResponse': false
             };
 
             var curlParams = '';
 
             for(var i = 0; i < response.data[key].method[method].length; i++) {
-              console.log("RAWRAWRAWR");
+              // This logs each parameter object
               console.log(response.data[key].method[method][i]);
 
               var paramObject = {};
 
-              for (type in response.data[key].method[method][i]) {
-                paramObject[type] = response.data[key].method[method][i][type];
-
-                if(type === 'name') {
-                  curlParams += response.data[key].method[method][i][type] + ',';
-                }
+              if(response.data[key].method[method][i].direction == 'in') {
+                // ADD IT TO THE ARRAY OF PARAMS
+                paramObject['type'] = $scope.getDataType(response.data[key].method[method][i].type);
+                paramObject['index'] = response.data[key].method[method][i];
+                paramObject['value'] = '';
+                m.parameters.push(paramObject);
               }
 
+              // Button click to run "THE METHOD"
+              // Pass the METHOD as a param
+              // $scope.method[method.name].parameters[p.index].value;
 
-              m.parameters.push(paramObject);
+
+
+              // This is looping through all the properties of the current parameter **********
+              // for (type in response.data[key].method[method][i]) {
+              //   paramObject[type] = response.data[key].method[method][i][type];
+              //
+              //   if(type === 'name') {
+              //     curlParams += response.data[key].method[method][i][type] + ',';
+              //   } else {
+              //     curlParams += response.data[key].method[method][i]
+              //   }
+              // }
+
+
+
 
               // var
               //
@@ -358,21 +448,21 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
             console.log(curlParams)
             curlParams = curlParams.slice(0, -1);
             console.log(curlParams);
-            if(curlParams === '') {
-              // GET OPERATION
-              m['curl'] = 'curl -c cjar -b cjar -k https://' + $rootScope.ip + $scope.currentPath + '/' + m.name;
-              m['type'] = 'GET';
+            if(m.parameters.length == 0) {
+              // m['curl'] = 'curl -H "Content-Type: application/json" -X POST http://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name;
               m['hideParams'] = true;
             } else {
-              // POST OPERATION
-              m['curl'] = 'curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" https://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name;
-              m['type'] = 'POST';
+              // Method contains paramters
+              // How to bind?
+              // m['curl'] = 'curl -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" http://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name;
+              // m['type'] = 'POST';
               m['hideParams'] = false;
             }
 
             m['collapsed'] = true;
 
             methods.push(m);
+            console.log(methods);
           }
         }
       }

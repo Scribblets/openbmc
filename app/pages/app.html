@@ -22,7 +22,7 @@
     <div class="topbar">
       <form id="searchForm">
         <i class="fa fa-search"></i>
-        <input type="text" name="search" ng-model="searchQuery" placeholder="Search..." />
+        <input type="text" name="search" ng-model="searchQuery" placeholder="Search... (Not Implemented)" />
       </form>
 
       <div class="metadata">
@@ -58,23 +58,23 @@
           <div class="parameters" ng-hide="method.hideParams">
             <h3>Parameters</h3>
             <!-- <p ng-show="method.hideParams">There are no parameters for this method.</p> -->
-            <div class="parameter" ng-repeat="parameter in method.parameters" ng-show="parameter.name">
-              <p class="name">{{parameter.name}}</p>
-              <div class="right">
-                <p class="dataType">???</p>
-                <input type="text" placeholder="31" />
+            <div class="parameter" ng-repeat="parameter in method.parameters">
+              <p class="name">{{parameter.type}}</p>
+              <input type="text" value="{{parameter.value}}" ng-model="parameter.value" />
+              <!-- <div class="right">
 
-              </div>
+              </div> -->
               <div class="clear"></div>
             </div>
           </div>
 
           <!-- Response Block -->
-          <div class="response">
+          <div class="response" ng-class="{'full-width': method.hideParams}">
             <h3>Response</h3>
             <div class="code">
-              <pre>{{testJSON}}</pre>
-              <button class="large-btn">Rerun</button>
+              <button class="run-btn" ng-hide="method.showResponse" ng-click="runMethod(method)">Run Method <i class="fa fa-play"></i></button>
+              <pre ng-show="method.showResponse">{{method.response}}</pre>
+              <button ng-show="method.showResponse" class="large-btn" ng-click="runMethod(method)">Rerun</button>
             </div>
           </div>
 
@@ -83,6 +83,9 @@
             <h3>cURL</h3>
             <div class="code">
               <p>{{method.curl}}</p>
+              <!-- m['curl'] = 'curl -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" http://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name; -->
+              <!-- curl -X POST -H "Content-Type:application/json" -d "{\"data\": [\"hello\"]}" http://9.41.164.53:20080/org/openbmc/examples/path0/SDBusObj/action/Echo -->
+              <p>curl -X POST -H "Content-Type: application/json" <span ng-hide="method.hideParams">-d "{\"data\": [<span ng-repeat="parameter in method.parameters"><span ng-show="parameter.type == 'string'">\"</span>{{parameter.value}}<span ng-show="parameter.type == 'string'">\"</span><span ng-hide="$last">,</span></span>]}"</span> http://{{ip}}{{currentPath}}/action/{{method.name}}</p>
               <button class="small-btn" ng-show="method.curl.length <= 96" ng-click="copy(method.curl)">Copy</button>
               <button class="large-btn" ng-show="method.curl.length > 96" ng-click="copy(method.curl)">Copy</button>
             </div>
