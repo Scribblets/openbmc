@@ -154,47 +154,88 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
 });
 
 openbmc.controller('appController', function($rootScope, $scope, $http, $location) {
-
-  $scope.testJSON = JSON.stringify({
-    'responseCode' : 200,
-    'responseMessage' : 'OK',
-    'data' : []
-  }, null, 4);
   _ipc.send('resize', 1008, 617);
   _ipc.send('toggleResizable', true);
 
-  console.log("APP CONTROLLER", $rootScope.ip);
-
-  $http({
-    url: 'http://' + $rootScope.ip + '/list',
-    method: 'GET',
-    headers: {
-      'Content-Type' : 'application/json'
-    }
-  }).success(function(response) {
-    console.log(response);
-
-    $scope.paths = parsePathArray(response.data);
-    $scope.navigate('/');
-  }).error(function(error) {
-    console.log(error);
-  });
-
   // console.log($rootScope.user);
   // console.log($rootScope.ip);
+  console.log('1');
+
+  $scope.update = function(currentPath) {
+    console.log("UPDATE SCOPE");
+    $http({
+      url: 'http://' + $rootScope.ip + '/list',
+      method: 'GET',
+      headers: {
+        'Content-Type' : 'application/json'
+      }
+    }).success(function(response) {
+      console.log(currentPath);
+      console.log(response);
+
+      if($scope.currentPath) {
+        if($scope.currentPath != response) {
+
+        }
+      }
+      var p = parsePathArray(response.data);
+      // $scope.paths = parsePathArray(response.data);
+
+      if(currentPath === '/') {
+        $scope.paths = parsePathArray(response.data);
+        $scope.navigate(currentPath);
+      } else if($scope.currentPath && $scope.currentPath != currentPath) {
+        $scope.paths = parsePathArray(response.data);
+        $scope.navigate(currentPath);
+      } else if(response.data.indexOf(currentPath) > -1) {
+        console.log("The PATH EXISTS!!!!!!!!!!!!!!!!!!!!!!!");
+        // The path exists!
+        // Check $scope.paths for new set of paths...
+        console.log("PATHS UPDATED?");
+        if($scope.paths && $scope.paths != p) {
+          // $scope.navigate(current)
+          // Paths Updated!!!!
+          console.log(true);
+          $scope.paths = parsePathArray(response.data);
+          $scope.options = getChildren($scope.currentPath);
+        } else {
+          console.log(false);
+          // Do nothing
+        }
+      } else {
+        // The path no longer exists... back one.
+        // $scope.paths = parsePathArray(response.data);
+        $scope.paths = parsePathArray(response.data);
+        currentPath = currentPath.substring(0, currentPath.lastIndexOf("/"));
+        console.log('The path no longer exists... back one.')
+        console.log("CurrentPath!!!!!!!!", currentPath);
+        $scope.navigate(currentPath);
+      }
+    }).error(function(error) {
+      console.log(error);
+    });
+  }
+
+  $scope.update('/');
 
   $scope.navigate = function(path) {
     $scope.currentPath = path;
     $scope.prettyPath = $scope.currentPath.split('/').join(' / ');
     $scope.options = getChildren($scope.currentPath);
     $scope.breadcrumb = getBreadcrumbs($scope.currentPath);
+    $scope.methods = [];
+    getSchema($rootScope.ip, path);
   }
 
   $scope.back = function() {
+    console.log("BACK!!!");
+    console.log($scope.currentPath);
     var previous = $scope.currentPath.split('/');
     previous.pop();
     previous = previous.join('/');
-    $scope.navigate(previous);
+    console.log(previous);
+    $scope.update(previous);
+    // $scope.navigate(previous);
   }
 
   $scope.openGithub = function() {
@@ -215,6 +256,7 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
   }
 
   $scope.runMethod = function(method) {
+    console.log("RUNINNG METHOD");
     console.log(method.parameters);
     if(method.parameters.length > 0) {
       var data = [];
@@ -227,11 +269,50 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         data: JSON.stringify({"data": data}),
         headers: {'Content-Type': 'application/json'}
       }).success(function(response) {
+        console.log("METHOD SUCCESS! @@@@@@@");
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
+        $http({
+          url: 'http://' + $rootScope.ip + '/list',
+          method: 'GET',
+          headers: {
+            'Content-Type' : 'application/json'
+          }
+        }).success(function(response) {
+
+          if($scope.paths != response.data) {
+            console.log("SCOPE PATHS ARE THE SAME");
+            $scope.paths = parsePathArray(response.data);
+            $scope.options = getChildren($scope.currentPath);
+          } else {
+            console.log("SCOPE PATHS NOT THE SAME");
+            console.log(response.data, $scope.paths);
+          }
+        }).error(function(e) {
+          console.log(e);
+        });
       }).error(function(response) {
+        console.log("METHOD ERROR! @@@@@@@");
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
+        $http({
+          url: 'http://' + $rootScope.ip + '/list',
+          method: 'GET',
+          headers: {
+            'Content-Type' : 'application/json'
+          }
+        }).success(function(response) {
+          if($scope.paths != response.data) {
+            console.log("SCOPE PATHS ARE THE SAME");
+            $scope.paths = parsePathArray(response.data);
+            $scope.options = getChildren($scope.currentPath);
+          } else {
+            console.log("SCOPE PATHS NOT THE SAME");
+            console.log(response.data, $scope.paths);
+          }
+        }).error(function(e) {
+          console.log(e);
+        });
       });
     } else {
       $http({
@@ -240,13 +321,51 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         data: {"data": []},
         headers: {'Content-Type': 'application/json'}
       }).success(function(response) {
+        $http({
+          url: 'http://' + $rootScope.ip + '/list',
+          method: 'GET',
+          headers: {
+            'Content-Type' : 'application/json'
+          }
+        }).success(function(response) {
+          if($scope.paths != response.data) {
+            console.log("SCOPE PATHS ARE THE SAME");
+            $scope.paths = parsePathArray(response.data);
+            $scope.options = getChildren($scope.currentPath);
+          } else {
+            console.log("SCOPE PATHS NOT THE SAME");
+            console.log(response.data, $scope.paths);
+          }
+        }).error(function(e) {
+          console.log(e);
+        });
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
       }).error(function(response) {
+        $http({
+          url: 'http://' + $rootScope.ip + '/list',
+          method: 'GET',
+          headers: {
+            'Content-Type' : 'application/json'
+          }
+        }).success(function(response) {
+          if($scope.paths != response.data) {
+            console.log("SCOPE PATHS ARE THE SAME");
+            $scope.paths = parsePathArray(response.data);
+            $scope.options = getChildren($scope.currentPath);
+          } else {
+            console.log("SCOPE PATHS NOT THE SAME");
+            console.log(response.data, $scope.paths);
+          }
+        }).error(function(e) {
+          console.log(e);
+        });
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
       });
     }
+
+    // $scope.update($scope.currentPath);
     // console.log("TEST THE METHOD!");
     // console.log("=====================");
     // // THIS WORKS!!!!
@@ -336,23 +455,32 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
 
     // getSchema($rootScope.ip, '20080', path);
 
-    if(options.length === 0) {
-      // Get Schema
-      console.log("====================");
-      console.log("SHOW SCHEMA!");
-      console.log("====================");
+    // options = $scope.options;
+    // for(var j = 0; j < options.length; j++) {
+    //   options[j]['active'] = false;
+    //
+    //   if(options[j].path === path) {
+    //     options[j]['active'] = true;
+    //   }
+    // }
 
-      getSchema($rootScope.ip, path);
-
-      options = $scope.options;
-      for(var j = 0; j < options.length; j++) {
-        options[j]['active'] = false;
-
-        if(options[j].path === path) {
-          options[j]['active'] = true;
-        }
-      }
-    }
+    // if(options.length === 0) {
+    //   // Get Schema
+    //   console.log("====================");
+    //   console.log("SHOW SCHEMA!");
+    //   console.log("====================");
+    //
+    //   getSchema($rootScope.ip, path);
+    //
+    //   options = $scope.options;
+    //   for(var j = 0; j < options.length; j++) {
+    //     options[j]['active'] = false;
+    //
+    //     if(options[j].path === path) {
+    //       options[j]['active'] = true;
+    //     }
+    //   }
+    // }
 
     return options;
     //console.log(position);
