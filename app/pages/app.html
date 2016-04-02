@@ -8,7 +8,7 @@
     </header>
 
     <div class="paths">
-      <a class="path noselect" ng-repeat="option in options" ng-class="{'active':option.active}" ng-click="navigate(option.path)">{{option.name}}</a>
+      <a class="path noselect" ng-repeat="option in options|orderBy: 'name'" ng-class="{'active':option.active}" ng-click="navigate(option.path)">{{option.name}}</a>
     </div>
 
     <footer class="github">
@@ -44,29 +44,32 @@
 
     <!-- Content -->
     <div class="container">
+
+      <!-- Methods -->
       <div class="method" ng-repeat="method in methods">
         <a class="click-me" ng-click="toggleMethod(method)"><div class="title">
-          <p><span>{{method.name}}</span>
-          <span class="chevron">
-            <i class="fa fa-chevron-down" ng-show="method.collapsed"></i>
-            <i class="fa fa-chevron-up" ng-hide="method.collapsed"></i>
-          </span></p>
+          <p>
+            <span>{{method.name}}</span>
+            <span class="identifier method-identifier">Method</span>
+            <span class="chevron">
+              <i class="fa fa-chevron-down" ng-show="method.collapsed"></i>
+              <i class="fa fa-chevron-up" ng-hide="method.collapsed"></i>
+            </span>
+          </p>
         </div></a>
         <div class="body" ng-hide="method.collapsed">
+
+
           <!-- Parameters Block -->
-          <!-- How can we hide parameters block? -->
           <div class="parameters" ng-hide="method.hideParams">
             <h3>Parameters</h3>
-            <!-- <p ng-show="method.hideParams">There are no parameters for this method.</p> -->
             <div class="parameter" ng-repeat="parameter in method.parameters">
               <p class="name">{{parameter.type}}</p>
               <input type="text" value="{{parameter.value}}" ng-model="parameter.value" />
-              <!-- <div class="right">
-
-              </div> -->
               <div class="clear"></div>
             </div>
           </div>
+
 
           <!-- Response Block -->
           <div class="response" ng-class="{'full-width': method.hideParams}">
@@ -82,12 +85,30 @@
           <div class="curl">
             <h3>cURL</h3>
             <div class="code">
-              <p>{{method.curl}}</p>
-              <!-- m['curl'] = 'curl -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" http://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name; -->
-              <!-- curl -X POST -H "Content-Type:application/json" -d "{\"data\": [\"hello\"]}" http://9.41.164.53:20080/org/openbmc/examples/path0/SDBusObj/action/Echo -->
-              <p>curl -X POST -H "Content-Type: application/json" <span ng-hide="method.hideParams">-d "{\"data\": [<span ng-repeat="parameter in method.parameters"><span ng-show="parameter.type == 'string'">\"</span>{{parameter.value}}<span ng-show="parameter.type == 'string'">\"</span><span ng-hide="$last">,</span></span>]}"</span> http://{{ip}}{{currentPath}}/action/{{method.name}}</p>
-              <button class="small-btn" ng-show="method.curl.length <= 96" ng-click="copy(method.curl)">Copy</button>
-              <button class="large-btn" ng-show="method.curl.length > 96" ng-click="copy(method.curl)">Copy</button>
+              <p id="curl-command">curl -X POST -H "Content-Type: application/json" <span ng-hide="method.hideParams">-d "{\"data\": [<span ng-repeat="parameter in method.parameters"><span ng-show="parameter.type == 'string'">\"</span>{{parameter.value}}<span ng-show="parameter.type == 'string'">\"</span><span ng-hide="$last">,</span></span>]}"</span> http://{{ip}}{{currentPath}}/action/{{method.name}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Parameters -->
+      <div class="method" ng-repeat="property in properties">
+        <a class="click-me" ng-click="toggleMethod(property)"><div class="title">
+          <p>
+            <span>{{property.name}}</span>
+            <span class="identifier property-identifier">Property</span>
+            <span class="chevron">
+              <i class="fa fa-chevron-down" ng-show="property.collapsed"></i>
+              <i class="fa fa-chevron-up" ng-hide="property.collapsed"></i>
+            </span>
+          </p>
+        </div></a>
+
+        <div class="body" ng-hide="property.collapsed">
+          <div class="curl">
+            <div class="code">
+              <pre>{{property.value}}</pre>
             </div>
           </div>
         </div>

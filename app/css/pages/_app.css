@@ -340,3 +340,25 @@
  .code button.large-btn {
    border-radius: 3px 0px 3px 0px;
  }
+
+
+/* Identifiers */
+.identifier {
+  font-size: 6pt;
+  position: relative;
+  top: -2px;
+  left: 5px;
+  display: inline-block;
+  padding: 4px 5px;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 2px;
+}
+
+.method-identifier {
+  background: #4ea6e3;
+}
+
+.property-identifier {
+  background: #35c6a7;
+}

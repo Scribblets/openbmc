@@ -40,14 +40,8 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
   $scope.login = function() {
     var ip = $scope.ipAddress;
 
-    console.log("SUBMITTED");
-    console.log($scope.ipAddress);
-    console.log($scope.port);
-
     if($scope.port) {
-      console.log("FOUND PORT", $scope.port);
       ip = ip + ':' + $scope.port;
-      console.log(ip);
     }
 
     var startTime = new Date().getTime();
@@ -60,14 +54,13 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
         'Content-Type' : 'application/json'
       }
     }).success(function(response) {
+
+      // Firewall Error
       if(typeof response != 'object') {
-        console.log("AUTH ERROR");
         $scope.loginError = true;
         $scope.errorMessage = 'Cannot bypass firewall on <b>' + $scope.ipAddress + '</b>';
         return;
       }
-
-      console.log(response);
 
       $rootScope.ip = ip;
       $rootScope.user = $scope.username;
@@ -75,14 +68,8 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
       $scope.error = false;
       $location.path('/app');
     }).error(function(result, status, header, config) {
-      console.log(error);
-      console.log(result);
-      console.log(status);
-      console.log(header);
-      console.log(config);
-
+      // Firewall Error
       if(typeof response != 'object') {
-        console.log("AUTH ERROR");
         $scope.loginError = true;
         $scope.errorMessage = 'Connection to <b>' + $scope.ipAddress + '</b> was refused.';
         return;
@@ -90,66 +77,17 @@ openbmc.controller('mainController', function($rootScope, $scope, $http, $cookie
 
       var respTime = new Date().getTime() - startTime;
 
+      // Timeout Error (Probably incorrect IP)
       if(respTime >= config.timeout) {
           $scope.loginError = true;
           $scope.errorMessage = "Could not connect to " + ip;
-          console.error('Could not connect to ' + ip);
         } else {
           $scope.loginError = true;
           $scope.errorMessage = "An unknown error occurred.";
-          console.error('An unknown error occurred. See details:');
-          console.log(result, status, header, config);
         }
     });
 
-    // $http({
-    //   url: 'http://' + ip + '/login',
-    //   method: 'POST',
-    //   data: JSON.stringify({"data": [$scope.username, $scope.password]}),
-    //   withCredentials: true,
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   timeout: 5000,
-    // }).success(function(response) {
-    //
-    //   if(typeof response != 'object') {
-    //     console.log("AUTH ERROR");
-    //     $scope.loginError = true;
-    //     $scope.errorMessage = 'Cannot bypass firewall on <b>' + $scope.ipAddress + '</b>';
-    //     return;
-    //   }
-    //
-    //   console.log(response);
-    //   console.log(response.data);
-    //
-    //   if(response.data === 'Invalid username or password') {
-    //     // Error: Credentials Incorrect
-    //     $scope.loginError = true;
-    //     $scope.errorMessage = "Username or password was incorrect";
-    //     console.error('Username or password was incorrect');
-    //   } else {
-    //     console.log('Logged in as ' + $scope.username);
-    //     // Success!
-    //     $scope.error = false;
-    //     $rootScope.ip = $scope.ipAddress;
-    //     $rootScope.user = $scope.username;
-    //     $location.path('/app');
-    //   }
-    //   // I need to set the cookie here!
-    // }).error(function(result, status, header, config) {
-    //   var respTime = new Date().getTime() - startTime;
-    //   if(respTime >= config.timeout) {
-    //     $scope.loginError = true;
-    //     $scope.errorMessage = "Could not connect to " + ip;
-    //     console.error('Could not connect to ' + ip);
-    //   } else {
-    //     $scope.loginError = true;
-    //     $scope.errorMessage = "An unknown error occurred.";
-    //     console.error('An unknown error occurred. See details:');
-    //     console.log(result, status, header, config);
-    //   }
-    // });
+    // Insert Login Block Here
   }
 });
 
@@ -157,12 +95,8 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
   _ipc.send('resize', 1008, 617);
   _ipc.send('toggleResizable', true);
 
-  // console.log($rootScope.user);
-  // console.log($rootScope.ip);
-  console.log('1');
-
+  // Update the scope data
   $scope.update = function(currentPath) {
-    console.log("UPDATE SCOPE");
     $http({
       url: 'http://' + $rootScope.ip + '/list',
       method: 'GET',
@@ -170,49 +104,29 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         'Content-Type' : 'application/json'
       }
     }).success(function(response) {
-      console.log(currentPath);
-      console.log(response);
-
-      if($scope.currentPath) {
-        if($scope.currentPath != response) {
-
-        }
-      }
       var p = parsePathArray(response.data);
-      // $scope.paths = parsePathArray(response.data);
 
-      if(currentPath === '/') {
-        $scope.paths = parsePathArray(response.data);
+      // Run if the current path is root
+      // OR if the currentPath has been changed
+      if(
+        currentPath === '/' ||
+        $scope.currentPath && $scope.currentPath != currentPath
+      ) {
+        $scope.paths = p;
         $scope.navigate(currentPath);
-      } else if($scope.currentPath && $scope.currentPath != currentPath) {
-        $scope.paths = parsePathArray(response.data);
-        $scope.navigate(currentPath);
-      } else if(response.data.indexOf(currentPath) > -1) {
-        console.log("The PATH EXISTS!!!!!!!!!!!!!!!!!!!!!!!");
-        // The path exists!
-        // Check $scope.paths for new set of paths...
-        console.log("PATHS UPDATED?");
-        if($scope.paths && $scope.paths != p) {
-          // $scope.navigate(current)
-          // Paths Updated!!!!
-          console.log(true);
-          $scope.paths = parsePathArray(response.data);
-          $scope.options = getChildren($scope.currentPath);
-        } else {
-          console.log(false);
-          // Do nothing
-        }
-      } else {
-        // The path no longer exists... back one.
-        // $scope.paths = parsePathArray(response.data);
-        $scope.paths = parsePathArray(response.data);
-        currentPath = currentPath.substring(0, currentPath.lastIndexOf("/"));
-        console.log('The path no longer exists... back one.')
-        console.log("CurrentPath!!!!!!!!", currentPath);
-        $scope.navigate(currentPath);
+
+      // Runs if the paths array (in response.data) was updated
+      } else if (
+        response.data.indexOf(currentPath) > -1 &&
+        $scope.paths &&
+        $scope.paths != p
+      ) {
+        $scope.paths = p;
+        $scope.options = getChildren($scope.currentPath);
       }
     }).error(function(error) {
-      console.log(error);
+      // There was an error making the request. Please try again.
+      // console.log(error);
     });
   }
 
@@ -224,18 +138,16 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
     $scope.options = getChildren($scope.currentPath);
     $scope.breadcrumb = getBreadcrumbs($scope.currentPath);
     $scope.methods = [];
+    $scope.properties = [];
     getSchema($rootScope.ip, path);
+    getProperties($rootScope.ip, path);
   }
 
   $scope.back = function() {
-    console.log("BACK!!!");
-    console.log($scope.currentPath);
     var previous = $scope.currentPath.split('/');
     previous.pop();
     previous = previous.join('/');
-    console.log(previous);
     $scope.update(previous);
-    // $scope.navigate(previous);
   }
 
   $scope.openGithub = function() {
@@ -256,63 +168,26 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
   }
 
   $scope.runMethod = function(method) {
-    console.log("RUNINNG METHOD");
-    console.log(method.parameters);
     if(method.parameters.length > 0) {
       var data = [];
+
       for (var i = 0; i < method.parameters.length; i++) {
         data.push(method.parameters[i].value);
       }
+
       $http({
         url: 'http://' + $rootScope.ip + $scope.currentPath + '/action/' + method.name,
         method: 'POST',
         data: JSON.stringify({"data": data}),
         headers: {'Content-Type': 'application/json'}
       }).success(function(response) {
-        console.log("METHOD SUCCESS! @@@@@@@");
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
-        $http({
-          url: 'http://' + $rootScope.ip + '/list',
-          method: 'GET',
-          headers: {
-            'Content-Type' : 'application/json'
-          }
-        }).success(function(response) {
-
-          if($scope.paths != response.data) {
-            console.log("SCOPE PATHS ARE THE SAME");
-            $scope.paths = parsePathArray(response.data);
-            $scope.options = getChildren($scope.currentPath);
-          } else {
-            console.log("SCOPE PATHS NOT THE SAME");
-            console.log(response.data, $scope.paths);
-          }
-        }).error(function(e) {
-          console.log(e);
-        });
+        $scope.update($scope.currentPath);
       }).error(function(response) {
-        console.log("METHOD ERROR! @@@@@@@");
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
-        $http({
-          url: 'http://' + $rootScope.ip + '/list',
-          method: 'GET',
-          headers: {
-            'Content-Type' : 'application/json'
-          }
-        }).success(function(response) {
-          if($scope.paths != response.data) {
-            console.log("SCOPE PATHS ARE THE SAME");
-            $scope.paths = parsePathArray(response.data);
-            $scope.options = getChildren($scope.currentPath);
-          } else {
-            console.log("SCOPE PATHS NOT THE SAME");
-            console.log(response.data, $scope.paths);
-          }
-        }).error(function(e) {
-          console.log(e);
-        });
+        $scope.update($scope.currentPath);
       });
     } else {
       $http({
@@ -321,66 +196,15 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         data: {"data": []},
         headers: {'Content-Type': 'application/json'}
       }).success(function(response) {
-        $http({
-          url: 'http://' + $rootScope.ip + '/list',
-          method: 'GET',
-          headers: {
-            'Content-Type' : 'application/json'
-          }
-        }).success(function(response) {
-          if($scope.paths != response.data) {
-            console.log("SCOPE PATHS ARE THE SAME");
-            $scope.paths = parsePathArray(response.data);
-            $scope.options = getChildren($scope.currentPath);
-          } else {
-            console.log("SCOPE PATHS NOT THE SAME");
-            console.log(response.data, $scope.paths);
-          }
-        }).error(function(e) {
-          console.log(e);
-        });
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
+        $scope.update($scope.currentPath);
       }).error(function(response) {
-        $http({
-          url: 'http://' + $rootScope.ip + '/list',
-          method: 'GET',
-          headers: {
-            'Content-Type' : 'application/json'
-          }
-        }).success(function(response) {
-          if($scope.paths != response.data) {
-            console.log("SCOPE PATHS ARE THE SAME");
-            $scope.paths = parsePathArray(response.data);
-            $scope.options = getChildren($scope.currentPath);
-          } else {
-            console.log("SCOPE PATHS NOT THE SAME");
-            console.log(response.data, $scope.paths);
-          }
-        }).error(function(e) {
-          console.log(e);
-        });
         method.showResponse = true;
         method.response = JSON.stringify(response, null, 4);
+        $scope.update($scope.currentPath);
       });
     }
-
-    // $scope.update($scope.currentPath);
-    // console.log("TEST THE METHOD!");
-    // console.log("=====================");
-    // // THIS WORKS!!!!
-    // $http({
-    //   url: 'http://9.41.164.53:20080/org/openbmc/examples/path0/SDBusObj/action/Echo',
-    //   method: 'POST',
-    //   data: JSON.stringify({"data": ["hello"]}),
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    // }).success(function(response) {
-    //   console.log(response);
-    // }).error(function(error) {
-    //   console.log(response);
-    // });
   }
 
   $scope.getDataType = function(type) {
@@ -449,46 +273,47 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         });
       }
     }
-    // if(options.isEmpty()) {
-    //   console.log("OPTIONS EMPTY");
-    // }
 
-    // getSchema($rootScope.ip, '20080', path);
-
-    // options = $scope.options;
-    // for(var j = 0; j < options.length; j++) {
-    //   options[j]['active'] = false;
-    //
-    //   if(options[j].path === path) {
-    //     options[j]['active'] = true;
-    //   }
-    // }
-
-    // if(options.length === 0) {
-    //   // Get Schema
-    //   console.log("====================");
-    //   console.log("SHOW SCHEMA!");
-    //   console.log("====================");
-    //
-    //   getSchema($rootScope.ip, path);
-    //
-    //   options = $scope.options;
-    //   for(var j = 0; j < options.length; j++) {
-    //     options[j]['active'] = false;
-    //
-    //     if(options[j].path === path) {
-    //       options[j]['active'] = true;
-    //     }
-    //   }
-    // }
+    // order options
+    console.log(options);
 
     return options;
-    //console.log(position);
+  }
+
+  function getProperties(ip, path) {
+    var query = 'http://' + ip + path;
+    $http({
+      url: query,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).success(function(response) {
+      // Data should be object, not array...
+      if(
+        typeof response.data === 'object' &&
+        Object.keys(response.data).length > 0
+      ) {
+          // Properties are available
+          var properties = [];
+          for (var key in response.data) {
+            // response.data[key];
+            var p = {
+              'name': key,
+              'value': JSON.stringify(response.data[key], null, 4),
+              'collapsed': true
+            }
+
+            properties.push(p);
+          }
+
+          $scope.properties = properties;
+      }
+    });
   }
 
   function getSchema(ip, path) {
     var query = 'http://' + ip + path + '/schema';
-    console.log('Running schema on... ' + query);
     $http({
       url: query,
       method: 'GET',
@@ -496,17 +321,11 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
         'Content-Type' : 'application/json'
       }
     }).success(function(response) {
-      console.log("THIS IS WHAT YOU WANT:::");
-      console.log(response.data);
       var methods = [];
       for (var key in response.data) {
-        // Focus on methods, disregard signals for now
-        // each object under method names is a parameter, so create an input
-        // 'name' is the name of the parameter
-        // before worrying about functions, present a list of methods
+        // Right now, we're just focusing on the list of
+        // openbmc methods that are available
         if(key.indexOf('openbmc') > -1) {
-          console.log(key);
-          console.log(response.data[key].method);
           // Inside the method object are multiple arrays.
           // The keys of the arrays are the name of the method (from the selected openbmc interface).
           // The array itself is a list of objects that are the parameters for the method.
@@ -516,11 +335,11 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
           // --- The name, is the name of the paramter.
           // --- The type is the datatype for the paramter.
           //     (Reference: https://dbus.freedesktop.org/doc/dbus-specification.html#type-system )
+
+          // This is looping over each method
           for(var method in response.data[key].method) {
-            // This is looping over each method
-            console.log("THE METHOD:", method);
-            // curl command:
-            // curl -c cjar -b cjar -k -H "Content-Type: application/json" -X POST -d "{\"data\": [<positional-parameters>]}" https://bmc/org/openbmc/control/fan0/action/setspeed
+
+            // Create a better object to store the method data
             var m = {
               'name' : method,
               'hideParams': true,
@@ -529,83 +348,44 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
               'showResponse': false
             };
 
-            var curlParams = '';
-
+            // This is looping over the parameters for each method
             for(var i = 0; i < response.data[key].method[method].length; i++) {
-              // This logs each parameter object
-              console.log(response.data[key].method[method][i]);
 
+              // Create a better object to store the parameter data
               var paramObject = {};
 
+              // If the direction of the parameter is 'in', add it to our array
+              // of parameters in the method object.
               if(response.data[key].method[method][i].direction == 'in') {
-                // ADD IT TO THE ARRAY OF PARAMS
                 paramObject['type'] = $scope.getDataType(response.data[key].method[method][i].type);
                 paramObject['index'] = response.data[key].method[method][i];
                 paramObject['value'] = '';
                 m.parameters.push(paramObject);
               }
-
-              // Button click to run "THE METHOD"
-              // Pass the METHOD as a param
-              // $scope.method[method.name].parameters[p.index].value;
-
-
-
-              // This is looping through all the properties of the current parameter **********
-              // for (type in response.data[key].method[method][i]) {
-              //   paramObject[type] = response.data[key].method[method][i][type];
-              //
-              //   if(type === 'name') {
-              //     curlParams += response.data[key].method[method][i][type] + ',';
-              //   } else {
-              //     curlParams += response.data[key].method[method][i]
-              //   }
-              // }
-
-
-
-
-              // var
-              //
-              // for(type in response.data[key].method[method][i]) {
-              //
-              // }
-              // This is looping over each parameter
-              // var p = {};
-              // p['name'] = response.data[key].method[method][i].name;
-              // p['direction'] = response.data[key].method[method][i].direction;
-              // p['type'] = response.data[key].method[method][i].type;
-
-              // m.parameters.push(p);
-
-              // curlParams += response.data[key].method[method][i].name + ', ';
             }
-            console.log(curlParams)
-            curlParams = curlParams.slice(0, -1);
-            console.log(curlParams);
+
+            // If the method doesn't have any parameters, just hide the section
             if(m.parameters.length == 0) {
-              // m['curl'] = 'curl -H "Content-Type: application/json" -X POST http://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name;
               m['hideParams'] = true;
             } else {
-              // Method contains paramters
-              // How to bind?
-              // m['curl'] = 'curl -H "Content-Type: application/json" -X POST -d "{\\"data\\": [' + curlParams + ']}" http://' + $rootScope.ip + $scope.currentPath + '/action/' + m.name;
-              // m['type'] = 'POST';
               m['hideParams'] = false;
             }
 
+            // Make sure all the panels start in a collapsed state
             m['collapsed'] = true;
 
+            // Finished creating the method object.
+            // Push it to the methods array.
             methods.push(m);
-            console.log(methods);
           }
         }
       }
-      console.log("LOGGING METHODS!");
-      // methods[0].collapsed = false;
+
+      // Bind methods array to scope
       $scope.methods = methods;
     }).error(function(error) {
-      console.log(error);
+      // There are no methods for this url
+      // We don't need to do anything here.
     });
   }
 
@@ -616,3 +396,54 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
     return p;
   }
 });
+
+
+// Login Block (Currently Disabled)
+// $http({
+//   url: 'http://' + ip + '/login',
+//   method: 'POST',
+//   data: JSON.stringify({"data": [$scope.username, $scope.password]}),
+//   withCredentials: true,
+//   headers: {
+//     'Content-Type': 'application/json'
+//   },
+//   timeout: 5000,
+// }).success(function(response) {
+//
+//   if(typeof response != 'object') {
+//     console.log("AUTH ERROR");
+//     $scope.loginError = true;
+//     $scope.errorMessage = 'Cannot bypass firewall on <b>' + $scope.ipAddress + '</b>';
+//     return;
+//   }
+//
+//   console.log(response);
+//   console.log(response.data);
+//
+//   if(response.data === 'Invalid username or password') {
+//     // Error: Credentials Incorrect
+//     $scope.loginError = true;
+//     $scope.errorMessage = "Username or password was incorrect";
+//     console.error('Username or password was incorrect');
+//   } else {
+//     console.log('Logged in as ' + $scope.username);
+//     // Success!
+//     $scope.error = false;
+//     $rootScope.ip = $scope.ipAddress;
+//     $rootScope.user = $scope.username;
+//     $location.path('/app');
+//   }
+//   // I need to set the cookie here!
+// }).error(function(result, status, header, config) {
+//   var respTime = new Date().getTime() - startTime;
+//   if(respTime >= config.timeout) {
+//     $scope.loginError = true;
+//     $scope.errorMessage = "Could not connect to " + ip;
+//     console.error('Could not connect to ' + ip);
+//   } else {
+//     $scope.loginError = true;
+//     $scope.errorMessage = "An unknown error occurred.";
+//     console.error('An unknown error occurred. See details:');
+//     console.log(result, status, header, config);
+//   }
+// });
