@@ -32,6 +32,7 @@ openbmc.config(function($routeProvider, $httpProvider) {
 });
 
 openbmc.controller('mainController', function($rootScope, $scope, $http, $cookies, $location) {
+  console.log(navigator.platform);
   _ipc.send('resize', 396, 445);
 
   $scope.loginError = false;
@@ -133,6 +134,17 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
   $scope.update('/');
 
   $scope.navigate = function(path) {
+    if(path != '/') {
+      $scope.lastPath = path.split('/');
+      $scope.lastPath = $scope.lastPath[$scope.lastPath.length - 1];
+      $scope.lastPath = $scope.lastPath.charAt(0).toUpperCase() + $scope.lastPath.slice(1);
+      console.log("Last Path" + $scope.lastPath);
+      if($scope.lastPath === '') {
+        $scope.lastPath = 'Root';
+      }
+    } else {
+      $scope.lastPath = 'Root';
+    }
     $scope.currentPath = path;
     $scope.prettyPath = $scope.currentPath.split('/').join(' / ');
     $scope.options = getChildren($scope.currentPath);
@@ -140,7 +152,10 @@ openbmc.controller('appController', function($rootScope, $scope, $http, $locatio
     $scope.methods = [];
     $scope.properties = [];
     getSchema($rootScope.ip, path);
-    getProperties($rootScope.ip, path);
+
+    if(path != '/' && path != '') {
+      getProperties($rootScope.ip, path);
+    }
   }
 
   $scope.back = function() {

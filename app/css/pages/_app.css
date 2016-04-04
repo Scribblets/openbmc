@@ -10,8 +10,8 @@
   padding: 0;
   overflow: auto;
   float: left;
-  /* background: #eef4f9; */
-  background: url('../../imgs/ibm.svg') 70% 50% / 550px 200px no-repeat, #eef4f9;
+  background: #eef4f9;
+  /*background: url('../../imgs/ibm.svg') 70% 50% / 550px 200px no-repeat, #eef4f9;*/
   position: relative;
   z-index: 1;
 }
